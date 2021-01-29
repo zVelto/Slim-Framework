@@ -1,64 +1,41 @@
 <?php
 
+use \Psr\Http\Message\ServerRequestInterface as Request;
+use \Psr\Http\Message\ResponseInterface as Response;
+
 require 'vendor/autoload.php';
 
 $app = new \Slim\app;
 
-$app->get('/postagens', function() {
+$app->get('/postagens', function(Request $request, Response $response) {
 
-    echo "Lista postagens";
+    $response->getBody()->write("Listagens de postagens");
 
-});
-
-$app->get('/usuarios[/{id}]', function($request, $response) {
-
-    $id = $request->getAttribute('id');
-    echo "Usuário ". $id;
+    return $response;
 
 });
 
-$app->get('/posts[/{ano}[/{mes}]]', function($request, $response) {
+$app->post('/usuarios/adiciona', function(Request $request, Response $response) {
 
-    $ano = $request->getAttribute('ano');
-    $mes = $request->getAttribute('mes');
+    $post = $request->getParsedBody();
 
-    echo "post - ". $ano . " / " . $mes;
-
-});
-
-$app->get('/lista/{itens:.*}', function($request, $response) {
-
-    $itens = $request->getAttribute('itens');
-
-    var_dump(explode("/", $itens));
+    return $response->getBody()->write($post['nome'] . " - " . $post['email']);
 
 });
 
-$app->get('/blog/postagens/{id}', function($request, $response) {
-    echo "Listar";
-})->setName("blog");
+$app->put('/usuarios/atualiza', function(Request $request, Response $response) {
 
-$app->get('/meusite', function($request, $response) {
+    $post = $request->getParsedBody();
 
-    $retorno = $this->get("router")->pathFor("blog", ["id" => 10] );
-
-    echo $retorno;
+    return $response->getBody()->write($post['nome'] . " - " . $post['email']);
 
 });
 
-$app->group('/v1', function() {
+$app->delete('/usuarios/deleta', function(Request $request, Response $response) {
 
-    $this->get('/postagens', function() {
+    $post = $request->getParsedBody();
 
-        echo "Lista postagens";
-    
-    });
-
-    $this->get('/usuarios', function() {
-
-        echo "Lista usuarios";
-    
-    });
+    return $response->getBody()->write($post['nome'] . " - " . $post['email']);
 
 });
 
