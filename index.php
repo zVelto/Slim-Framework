@@ -5,38 +5,34 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 require 'vendor/autoload.php';
 
-$app = new \Slim\app;
+$app = new \Slim\app([
+    'settings' => [
+        'displayErrorDetails' => true
+    ]
+]);
 
-$app->get('/postagens', function(Request $request, Response $response) {
+class Servico {
 
-    $response->getBody()->write("Listagens de postagens");
+}
 
-    return $response;
+$container = $app->getContainer();
+$container['servico'] = function() {
+    return new Servico;
+};
 
-});
+$app->get('/servico', function(Request $request, Response $response) {
 
-$app->post('/usuarios/adiciona', function(Request $request, Response $response) {
-
-    $post = $request->getParsedBody();
-
-    return $response->getBody()->write($post['nome'] . " - " . $post['email']);
-
-});
-
-$app->put('/usuarios/atualiza', function(Request $request, Response $response) {
-
-    $post = $request->getParsedBody();
-
-    return $response->getBody()->write($post['nome'] . " - " . $post['email']);
+    $servico = $this->get('servico');
+    var_dump($servico);
 
 });
 
-$app->delete('/usuarios/deleta', function(Request $request, Response $response) {
+$container = $app->getContainer();
+$container['Home'] = function() {
+    return new MyApp\controllers\Home(new MyApp\View);
+};
 
-    $post = $request->getParsedBody();
+$app->get('/usuario', 'Home:index');
 
-    return $response->getBody()->write($post['nome'] . " - " . $post['email']);
-
-});
 
 $app->run();
