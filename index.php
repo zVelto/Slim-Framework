@@ -2,6 +2,7 @@
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 require 'vendor/autoload.php';
 
@@ -11,28 +12,69 @@ $app = new \Slim\app([
     ]
 ]);
 
-class Servico {
-
-}
-
 $container = $app->getContainer();
-$container['servico'] = function() {
-    return new Servico;
+$container['db'] = function() {
+
+    $capsule = new Capsule;
+
+    $capsule->addConnection([
+        'driver'    => 'mysql',
+        'host'      => 'localhost',
+        'database'  => 'slim',
+        'username'  => 'root',
+        'password'  => '',
+        'charset'   => 'utf8',
+        'collation' => 'utf8_unicode_ci',
+        'prefix'    => '',
+    ]);
+
+    $capsule->setAsGlobal();
+    $capsule->bootEloquent();
+
+    return $capsule;
 };
 
-$app->get('/servico', function(Request $request, Response $response) {
+$app->get('/usuarios', function(Request $request, Response $response){
 
-    $servico = $this->get('servico');
-    var_dump($servico);
+    $db = $this->get('db');
+    /*$db->schema()->dropIfExists('usuarios');
+    $db->schema()->create('usuarios', function($table){
+
+        $table->increments('id');
+        $table->string('nome');
+        $table->string('email');
+        $table->timestamps();
+
+    });
+
+    $db->table('usuarios')->insert([
+        'nome' => 'Welton Carvalho',
+        'email' => 'welton@gmail.com'
+    ]);
+
+
+    $db->table('usuarios')
+                ->where('id', 1)
+                ->update([
+                    'nome' => 'Welton'
+                ]);
+
+
+    $db->table('usuarios')
+                ->where('id', 1)
+                ->delete();
+
+    */
+
+    
+    $usuarios = $db->table('usuarios')->get();
+
+    foreach ($usuarios as $usuario) {
+        echo $usuario->nome . '<br>';
+    }
+    
 
 });
-
-$container = $app->getContainer();
-$container['Home'] = function() {
-    return new MyApp\controllers\Home(new MyApp\View);
-};
-
-$app->get('/usuario', 'Home:index');
 
 
 $app->run();
